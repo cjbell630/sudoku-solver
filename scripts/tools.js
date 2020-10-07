@@ -31,8 +31,8 @@ function buildAndDisplayTable(board = undefined) {
                     tile = baseTile.cloneNode(true); // copies the unhidden base tile
                     if (board !== undefined) { // if the user did not supply a board parameter
                         tile.innerText = board[y][x][b][a];
-                        tile.setAttribute("contenteditable", false); // TODO: decide later
                     }
+                    /*tile.setAttribute("contenteditable", false);*/// TODO: falsifying contenteditable messes up proportions
                     tileHolder.appendChild(tile); // puts the tile in the tile holder (cell)
                 }
             }
