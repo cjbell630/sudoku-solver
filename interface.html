@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .sudokutile {
+            text-align: center;
+        }
+
+        table, th, td {
+            border: 4px solid black;
+            border-collapse: collapse;
+        }
+
+        table {
+            table-layout: fixed;
+            width: 60%;
+        }
+
+        table .innertable {
+            table-layout: fixed;
+            width: 100%;
+        }
+    </style>
+    <script src="tools.js"></script>
+    <script src="solver.js"></script>
+</head>
+<body>
+<button onclick="collect_and_solve()">Solve</button>
+<h1 class="sudokutile"
+    id="basetile"
+    contenteditable=true hidden></h1>
+<script>
+    buildTable();
+    addKeyRulesToTiles();
+</script>
+</body>
+</html>
+
+
