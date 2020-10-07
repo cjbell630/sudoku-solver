@@ -1,6 +1,6 @@
 /**
  * builds and displays either an empty table or one based on the given board.
- * @param board {[[[[string]]]]} - the 4d array of strings to build the table from ([y][x][b][a])
+ * @param board {[[[[string|Tile]]]]} - the 4d array of strings to build the table from ([y][x][b][a])
  */
 function buildAndDisplayTable(board = undefined) {
     let baseTile = document.getElementById("base-tile");
@@ -30,7 +30,7 @@ function buildAndDisplayTable(board = undefined) {
                     tileHolder = rowOfTiles.insertCell();
                     tile = baseTile.cloneNode(true); // copies the unhidden base tile
                     if (board !== undefined) { // if the user did not supply a board parameter
-                        tile.innerText = board[y][x][b][a];
+                        tile.innerText = board[y][x][b][a].toString();
                     }
                     /*tile.setAttribute("contenteditable", false);*/// TODO: falsifying contenteditable messes up proportions
                     tileHolder.appendChild(tile); // puts the tile in the tile holder (cell)
@@ -79,7 +79,7 @@ function collectAndSolve() {
                 square.push([]);
                 Array.from(a.cells).forEach(function (b) {
                     rowOfTiles = square[square.length - 1]
-                    rowOfTiles.push(b.innerText); // TODO: cast to int
+                    rowOfTiles.push(new Tile(b.innerText)); // TODO: cast to int
                 })
             })
         })
