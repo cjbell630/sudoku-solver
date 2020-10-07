@@ -8,7 +8,7 @@ function buildTable(board = undefined) {
     let table = document.createElement("table");
     table.className = "maintable"
     table.id = "maintable";
-    //verify var naming
+    //TODO: verify var naming
     let tile;
     let row;
     let cell;
