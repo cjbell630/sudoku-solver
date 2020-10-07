@@ -1,6 +1,6 @@
 /**
- * builds and displays either an empty table or one based on the given board.
- * @param board {[[[[string|Tile]]]]} - the 4d array of strings to build the table from ([y][x][b][a])
+ * Builds and displays either an empty table or one based on the given board.
+ * @param board {string[][][][]|Tile[][][][]} - the 4d array of strings to build the table from ([y][x][b][a])
  */
 function buildAndDisplayTable(board = undefined) {
     let baseTile = document.getElementById("base-tile");
@@ -43,7 +43,7 @@ function buildAndDisplayTable(board = undefined) {
 }
 
 /**
- * adds the key restrictions (only 1-9, only length 0-1) to every element with the class name "sudoku-tile".
+ * Adds the key restrictions (only 1-9, only length 0-1) to every element with the class name "sudoku-tile".
  */
 function addKeyRulesToTiles() {
     Array.from(document.getElementsByClassName("sudoku-tile")).forEach(function (element) {
@@ -61,7 +61,7 @@ function addKeyRulesToTiles() {
 }
 
 /**
- * collects the information in the displayed table into a more readable array.
+ * Collects the information in the displayed table into a more readable array.
  */
 function collectAndSolve() {
     let board = [];
