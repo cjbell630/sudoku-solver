@@ -2,40 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Sudoku Solver</title>
     <style>
+        /* special style for each tile. */
         .sudokutile {
             text-align: center;
         }
 
+        /* special style for tables, table headers (not currently present) and table cells. */
         table, th, td {
             border: 4px solid black;
             border-collapse: collapse;
         }
 
+        /* special style for tables. */
         table {
             table-layout: fixed;
             width: 60%;
         }
 
+        /* possibly unnecessary, but applies special settings to the inner 3x3 tables. */
         table .innertable {
             table-layout: fixed;
             width: 100%;
         }
     </style>
+
+    <!--imports source scripts. neither script has code that's run in these two lines.-->
     <script src="tools.js"></script>
     <script src="solver.js"></script>
 </head>
+
+
 <body>
+
+<!--the solve button. calls collect_and_solve() from solver.js-->
 <button onclick="collect_and_solve()">Solve</button>
-<h1 class="sudokutile"
-    id="basetile"
-    contenteditable=true hidden></h1>
+
+<!--the tile to base all other tiles off of. It's hidden, but the hidden tag is manually removed when it's cloned.-->
+<h1 class="sudokutile" id="basetile" contenteditable=true hidden></h1>
+
+<!--Script to run when the page is loaded-->
 <script>
-    buildTable();
-    addKeyRulesToTiles();
+    buildTable(); // (tools.js) builds and displays an empty table
+    addKeyRulesToTiles(); // (tools.js) adds input restrictions to every tile
 </script>
+
 </body>
 </html>
-
-
