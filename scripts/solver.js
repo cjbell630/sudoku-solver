@@ -17,7 +17,7 @@ function solve(board) {
                         let tile = board[y][x][b][a];
                         let tileSolution = tile.solution(); // must be stored here or causes some problems with deleting itself
                         if (tileSolution !== -1) { // if it has a solution
-                            matchFuncsToUse.forEach(function (matchFunc) { // iterates through the match functions supplied in match-functions.js
+                            MatchFunctions.matchFuncsToUse.forEach(function (matchFunc) { // iterates through the match functions supplied in match-functions.js
                                 // tests the position against each of the match functions
                                 getOtherMatches([y, x, b, a], matchFunc).forEach(function (match) {
                                     console.log(match + " cannot be " + tileSolution + " because in the same " + matchFunc.name + " as " + [y, x, b, a]);
