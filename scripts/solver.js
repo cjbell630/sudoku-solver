@@ -4,7 +4,7 @@
  * @returns {[[[[string]]]]} - the solved 4d array
  */
 function solve(board) {
-    //TODO: change param and return from string[][][][] to int[][][][]
-    //TODO: actually solve
+    // TODO: change param and return from string[][][][] to int[][][][]
+    // TODO: actually solve
     return board; //solved
 }
