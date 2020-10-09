@@ -17,14 +17,37 @@
  */
 class MatchFunctions {
     /* vanilla sudoku */
+
+    static checkIfSafe(values) {
+        for (let i = 0; i < values.length; i++) {
+            if (values[i] === undefined) {
+                console.log("invalid options supplied, " + values + " is unsafe");
+                return false;
+            }
+        }
+        return true;
+    }
+
     static row = function (position) {
-        return [position[0], -1, position[2], -1];
+        if (MatchFunctions.checkIfSafe([position[0], position[2]])) {
+            return [position[0], -1, position[2], -1];
+        } else {
+            return [];
+        }
     }
     static column = function (position) {
-        return [-1, position[1], -1, position[3]];
+        if (MatchFunctions.checkIfSafe([position[1], position[3]])) {
+            return [-1, position[1], -1, position[3]];
+        } else {
+            return [];
+        }
     }
     static square = function (position) {
-        return [position[0], position[1], -1, -1];
+        if (MatchFunctions.checkIfSafe([position[0], position[1]])) {
+            return [position[0], position[1], -1, -1];
+        } else {
+            return [];
+        }
     }
 
     /* other examples */
@@ -44,7 +67,6 @@ class MatchFunctions {
         ]
         return [position[0], position[1], -1, -1];
     }
-
 
 
     /**

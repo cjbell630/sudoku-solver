@@ -7,11 +7,13 @@ function solve(board) {
     //console.log(allPossibleArrays([-1, -1, -1, -1]))
     //console.log(getMatches(0, 0, 0, 0, rows))
     //TODO: remove log messages
+    let t0 = performance.now();
     let changed = true;
     while (changed) {
         changed = false;
         for (let y = 0; y < 3; y++) { // rows of squares
             for (let x = 0; x < 3; x++) { // squares
+                let absolutePositions = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
                 for (let b = 0; b < 3; b++) { // rows of tiles
                     for (let a = 0; a < 3; a++) { // tiles
                         let tile = board[y][x][b][a];
@@ -27,14 +29,49 @@ function solve(board) {
                                 });
                             })
                         }
+                        tile.possibilities.split("").forEach(function (stringNum) {
+                            let num = parseInt(stringNum);
+                            if(absolutePositions[num] === undefined){
+                                absolutePositions[num] = [y, x, b, a];
+                            }else{
+                                let prev = absolutePositions[num];
+                                let curr = [y, x, b, a];
+                                for(let i=0; i<prev.length; i++){
+                                    if(prev[i]!==curr[i]){
+                                        prev[i] = undefined;
+                                    }
+                                }
+                                absolutePositions[num] = prev;
+                            }
+                        });
                     }
                 }
+                let guess = 1;
+                absolutePositions.forEach(function(abs){
+                    if(abs!==undefined){
+                        MatchFunctions.matchFuncsToUse.forEach(function (matchFunc) { // iterates through the match functions supplied in match-functions.js
+                            // tests the position against each of the match functions
+                            getOtherMatches(abs, matchFunc).forEach(function (match) {
+                                if(match[0]!==y && match[1] !== x) {
+                                    console.log(match + " cannot be " + guess + " because in the same " + matchFunc.name + " as " + abs);
+                                    // if this function produced a change, changed will be true after this line
+                                    changed |= board[match[0]][match[1]][match[2]][match[3]].removePossibility(guess);
+                                }
+                            });
+                        })
+                    }
+                    guess++;
+                });
             }
         }
         console.log("iterated through all tiles once")
+        console.log("\n\n\n\n\n\n\n\n\n\n\n\n")
+        console.log(board)
+        console.log("\n\n\n\n\n\n\n\n\n\n\n\n")
         //TODO: check guess values ex 8 must be in this square and column so no other 8s can be in that column outside of the square
     }
-
+    let t1 = performance.now();
+    console.log("solved in " + (t1-t0) + "ms.")
     return board; // solved
 }
 
@@ -146,6 +183,9 @@ function allPossibleArrays(array, startInc = 0, endExc = 3, undefValue = -1) { /
      * example: [0, 0, 0, undefined] should return
      * [[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 2]]
      */
+    if (array.length === 0) {
+        return [];
+    }
     let solutions = [];
     //console.log("finding solutions for " + array);
     let firstUndefinedIndex = array.indexOf(undefValue);
