@@ -13,12 +13,25 @@ function solve(board) {
         changed = false;
         for (let y = 0; y < 3; y++) { // rows of squares
             for (let x = 0; x < 3; x++) { // squares
-                let absolutePositions = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+                let reversePossibilitiesForSquare = [[], [], [], [], [], [], [], [], []];
                 for (let b = 0; b < 3; b++) { // rows of tiles
                     for (let a = 0; a < 3; a++) { // tiles
                         let tile = board[y][x][b][a];
                         let tileSolution = tile.solution(); // must be stored here or causes some problems with deleting itself
-                        if (tileSolution !== -1) { // if it has a solution
+                        if (tileSolution === -1) { // if it doesn't have a solution
+                            console.log("storing possibilities for " + y + ", " + x + ", " + b + ", " + a + "\n-----");
+                            tile.possibilities.split("").forEach(function (stringNum) {
+                                let num = parseInt(stringNum) - 1;
+                                console.log("storing that this tile could possibly be " + (num + 1));
+                                let reversePossibilitiesDebug = JSON.parse(JSON.stringify(reversePossibilitiesForSquare));
+                                console.log("reverse poss: ");
+                                console.log(reversePossibilitiesDebug);
+                                if (reversePossibilitiesForSquare[num][0] !== -1) {
+                                    reversePossibilitiesForSquare[num].push([y, x, b, a]);
+                                }
+                            });
+                            console.log("done");
+                        } else { // if it has a solution
                             MatchFunctions.matchFuncsToUse.forEach(function (matchFunc) { // iterates through the match functions supplied in match-functions.js
                                 // tests the position against each of the match functions
                                 getOtherMatches([y, x, b, a], matchFunc).forEach(function (match) {
@@ -27,51 +40,67 @@ function solve(board) {
                                     // if this function produced a change, changed will be true after this line
                                     changed |= board[match[0]][match[1]][match[2]][match[3]].removePossibility(tileSolution);
                                 });
-                            })
+                            });
+                            reversePossibilitiesForSquare[tileSolution - 1] = [-1];
                         }
-                        tile.possibilities.split("").forEach(function (stringNum) {
-                            let num = parseInt(stringNum);
-                            if(absolutePositions[num] === undefined){
-                                absolutePositions[num] = [y, x, b, a];
-                            }else{
-                                let prev = absolutePositions[num];
-                                let curr = [y, x, b, a];
-                                for(let i=0; i<prev.length; i++){
-                                    if(prev[i]!==curr[i]){
-                                        prev[i] = undefined;
-                                    }
-                                }
-                                absolutePositions[num] = prev;
-                            }
-                        });
                     }
                 }
                 let guess = 1;
-                absolutePositions.forEach(function(abs){
-                    if(abs!==undefined){
+                console.log("reverse possibilities is \n-----------")
+                console.log(reversePossibilitiesForSquare);
+                console.log("-----------")
+                reversePossibilitiesForSquare.forEach(function (positions) {
+                    if (positions.length === 1) {
+                        let position = positions[0];
+                        if (position !== -1) {
+                            console.log(position + " " + guess);
+                            console.log(board[position[0]][position[1]][position[2]][position[3]].possibilities)
+                            board[position[0]][position[1]][position[2]][position[3]].possibilities = guess + "";
+                            changed = true;
+                            console.log("found solution for " + position + " using reverse possibilities: " + guess);
+                        } else {
+                            console.log("reverse possibilities says that the " + guess + " for " + y + " " + x + " has already been found");
+                        }
+                        //TODO: do reverse possibilities for row and columns as well (only option for x in row/column)
+                    } else if(positions.length < 4) {
+                        let absolutePosition = [];
+                        console.log("found a reverse possibilities for " + guess + " at " + positions);
+                        positions.forEach(function (position) {
+                            if (absolutePosition.length===0) {
+                                absolutePosition = JSON.parse(JSON.stringify(position));
+                            } else {
+                                for (let i = 0; i < 4; i++) {
+                                    if (absolutePosition[i] !== position[i]) {
+                                        absolutePosition[i] = undefined;
+                                    }
+                                }
+                            }
+                        });
                         MatchFunctions.matchFuncsToUse.forEach(function (matchFunc) { // iterates through the match functions supplied in match-functions.js
                             // tests the position against each of the match functions
-                            getOtherMatches(abs, matchFunc).forEach(function (match) {
-                                if(match[0]!==y && match[1] !== x) {
-                                    console.log(match + " cannot be " + guess + " because in the same " + matchFunc.name + " as " + abs);
+                            if (matchFunc.name !== "square") { //dont include square because it's searching in square
+                                console.log("checking for reverse possibility matches against " + guess + " at " + absolutePosition);
+                                getOtherMatches(absolutePosition, matchFunc, true).forEach(function (match) {
+                                    console.log(match + " cannot be " + guess + " because in the same " + matchFunc.name + " as " + absolutePosition);
                                     // if this function produced a change, changed will be true after this line
                                     changed |= board[match[0]][match[1]][match[2]][match[3]].removePossibility(guess);
-                                }
-                            });
-                        })
+                                });
+                            }
+                        });
                     }
                     guess++;
                 });
             }
         }
+        let debugBoard = JSON.parse(JSON.stringify(board));
         console.log("iterated through all tiles once")
         console.log("\n\n\n\n\n\n\n\n\n\n\n\n")
-        console.log(board)
+        console.log(debugBoard)
         console.log("\n\n\n\n\n\n\n\n\n\n\n\n")
         //TODO: check guess values ex 8 must be in this square and column so no other 8s can be in that column outside of the square
     }
     let t1 = performance.now();
-    console.log("solved in " + (t1-t0) + "ms.")
+    console.log("solved in " + (t1 - t0) + "ms.")
     return board; // solved
 }
 
@@ -122,8 +151,13 @@ class Tile {
      * @override
      * @returns {string|string} - the Tile's solution if it has one, otherwise just a ?
      */
-    toString() {
-        return this.solution() === -1 ? "?" : this.solution() + "";
+    toString(debug=true) {
+        if(debug) {
+            return this.solution() === -1 ? "?" + this.possibilities + "?" : this.solution() + "";
+        }else{
+            return this.solution() === -1 ? "?" : this.solution() + "";
+        }
+        //return this.solution() === -1 ? "?" : this.solution() + "";
     }
 
     /**
@@ -146,12 +180,17 @@ class Tile {
  *                                          (typically a 1d array with 4 values ranging from 1-9)
  *                                          and returns another 1d of the same length where -1s represent positions
  *                                          which may have any value 1-9. See match-functions.js for more information
+ * @param excludeSquare TODO
  * @returns {number[][]} - a list of all positions (same requirements as position) which matched against the given function and position
  */
-function getOtherMatches(position, condition) {
+function getOtherMatches(position, condition, excludeSquare=false) {
     let matches = allPossibleArrays(condition(position)); //TODO: see above
-    console.log("running removeElement on " + matches);
     removeFirst(matches, position); // removes the original position if it was matched against itself
+    if(excludeSquare){
+        allPossibleArrays(MatchFunctions.square(position)).forEach(function(posInSquare){
+            removeFirst(matches, posInSquare);
+        });
+    }
     return matches;
 }
 
@@ -215,13 +254,10 @@ function allPossibleArrays(array, startInc = 0, endExc = 3, undefValue = -1) { /
  * @param element {E} - the element to find and remove the first instance of
  */
 function removeFirst(array, element) {
-    console.log("removing element " + element + " from " + array);
     let index = 0;
     array.forEach(function (e) {
         if (JSON.stringify(e) === JSON.stringify(element)) { // converts to JSON string to ensure compatibility with multi-dimensional arrays.
-            console.log("found at index " + index);
             array.splice(index, 1);
-            console.log("removed element. now " + array);
             return true;
         }
         index++;

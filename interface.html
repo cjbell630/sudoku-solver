@@ -39,6 +39,8 @@
 
 <!--the solve button. calls collect_and_solve() from solver.js-->
 <button onclick="collectAndSolve()">Solve</button>
+<button onclick="document.getElementById('puzzle-string').innerText = convertToString()">Get URL [DOESN'T WORK YET]</button>
+<p id="puzzle-string"></p>
 
 <!--the tile to base all other tiles off of. It's hidden, but the hidden tag is manually removed when it's cloned.-->
 <h1 class="sudoku-tile" id="base-tile" contenteditable=true hidden></h1>

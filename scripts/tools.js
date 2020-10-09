@@ -3,6 +3,7 @@
  * @param board {string[][][][]|Tile[][][][]} - the 4d array of strings to build the table from ([y][x][b][a])
  */
 function buildAndDisplayTable(board = undefined) {
+    //TODO: make it edit the board instaed of rebuilding if possible so the changed tiles can be color coded
     let baseTile = document.getElementById("base-tile");
     baseTile = baseTile.cloneNode(true);
     baseTile.removeAttribute("hidden"); // unhide any tiles cloned from this one (but keep the original hidden)
@@ -61,14 +62,15 @@ function addKeyRulesToTiles() {
 }
 
 /**
- * Collects the information in the displayed table into a more readable array.
+ *
+ * @returns {[]}
  */
-function collectAndSolve() {
+function collect(){
     let board = [];
     let rowOfSquares;
     let square;
     let rowOfTiles;
-    let table = document.getElementById("main-table")
+    let table = document.getElementById("main-table");
     Array.from(table.rows).forEach(function (y) {
         board.push([]);
         Array.from(y.cells).forEach(function (x) {
@@ -80,10 +82,37 @@ function collectAndSolve() {
                 Array.from(a.cells).forEach(function (b) {
                     rowOfTiles = square[square.length - 1]
                     rowOfTiles.push(new Tile(b.innerText)); // TODO: cast to int
-                })
-            })
-        })
-    })
-    console.log(board); // TODO: remove when finished
+                });
+            });
+        });
+    });
+    return board;
+}
+
+/**
+ * Collects the information in the displayed table into a more readable array.
+ */
+function collectAndSolve() {
+    let board = collect();
+    let debugBoard = JSON.parse(JSON.stringify(board));
+    console.log(debugBoard); // TODO: remove when finished
     buildAndDisplayTable(solve(board));
 }
+
+function convertToString(){
+    let board = collect();
+    let str = "";
+    let temp;
+    for (let y = 0; y < 3; y++) { // rows of squares
+        for (let x = 0; x < 3; x++) { // squares
+            for (let b = 0; b < 3; b++) { // rows of tiles within square
+                for (let a = 0; a < 3; a++) { // tiles within square
+                    temp = board[y][x][b][a].toString(false);
+                    str += temp==="?"? "0" : temp;
+                }
+            }
+        }
+    }
+    return str;
+}
+
